@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .t-calendar {
+      width: 300px;
+      background-color: #f0f0f0;
+      border-radius: 12px;
+      margin: 50px auto;
+      font-family: Arial, Helvetica, sans-serif;
+      box-shadow: 0 0 8px #808080;
+      user-select: none;
+    }
+
+    .t-calendar-header {
+      position: relative;
+      width: 100%;
+      background-color: #101055;
+      color: #f0f0f0;
+      border-top-right-radius: 12px;
+      border-top-left-radius: 12px;
+      font-size: 10pt;
+      padding: 6px 0;
+    }
+
+    .t-calendar-title {
+      display: inline;
+      margin-left: 15px;
+    }
+
+    .t-calendar-month {
+      margin-right: 5px;
+    }
+
+    .t-calendar-body {
+      width: 100%;
+    }
+
+    .t-calendar-body table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .t-calendar-body table th {
+      width: calc(100% / 7);
+      padding: 3px 0;
+    }
+
+    td {
+      text-align: center;
+      font-size: 10pt;
+      padding: 3px 0;
+    }
+
+    .t-calendar table td:hover {
+      background-color: rgb(255, 211, 129);
+      cursor: pointer;
+    }
+
+    .t-calendar table tr:last-child td:last-child:hover {
+      border-bottom-right-radius: 12px;
+    }
+
+    .t-calendar table tr:last-child td:first-child:hover {
+      border-bottom-left-radius: 12px;
+    }
+
+    /* th {
+      border-bottom: 1px solid #aaa;
+    } */
+
+    .t-weekday-row {
+      color: #101055;
+      background-color: #cacacf;
+      font-weight: bolder;
+      font-size: 8pt;
+      border-bottom: 1px solid #aaa;
+    }
+
+    .t-days-area {
+      /* background-color: rgb(100, 150, 180, 0.5); */
+      display: flex;
+      flex-direction: column;
+      height: calc(100% - 10px - 1px);
+    }
+
+    .t-week-row {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .t-day {
+      text-align: right;
+      background-color: red;
+    }
+
+    td.next,
+    td.previous {
+      color: #808080;
+      /* #777 */
+    }
+
+    .t-calendar-control {
+      position: absolute;
+      right: 10px;
+      display: inline;
+    }
+
+    .t-ctrl {
+      font-size: 0.9em;
+      margin-left: 5px;
+      user-select: none;
+    }
+
+    .t-ctrl:hover {
+      cursor: pointer;
+    }
+
+    .t-ctrl.close {
+      font-size: 0.8em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="t-calendar m-12 y-2021 pt-br">
+    <!-- criar validação via regex, melhor... -->
+  </div>
+  <div class="t-calendar m-3 y-2020"></div>
+  <script>
+    const monthInfo = [
+      { key: 'jan', name: { 'en-us': 'January', 'pt-br': 'Janeiro' }, totalDays: 31 },
+      { key: 'feb', name: { 'en-us': 'February', 'pt-br': 'Fevereiro' }, totalDays: 28 },
+      { key: 'mar', name: { 'en-us': 'March', 'pt-br': 'Março' }, totalDays: 31 },
+      { key: 'apr', name: { 'en-us': 'April', 'pt-br': 'Abril' }, totalDays: 30 },
+      { key: 'may', name: { 'en-us': 'May', 'pt-br': 'Maio' }, totalDays: 31 },
+      { key: 'jun', name: { 'en-us': 'June', 'pt-br': 'Junho' }, totalDays: 30 },
+      { key: 'jul', name: { 'en-us': 'July', 'pt-br': 'Julho' }, totalDays: 31 },
+      { key: 'aug', name: { 'en-us': 'August', 'pt-br': 'Agosto' }, totalDays: 31 },
+      { key: 'sep', name: { 'en-us': 'September', 'pt-br': 'Setembro' }, totalDays: 30 },
+      { key: 'oct', name: { 'en-us': 'October', 'pt-br': 'Outubro' }, totalDays: 31 },
+      { key: 'nov', name: { 'en-us': 'November', 'pt-br': 'Novembro' }, totalDays: 30 },
+      { key: 'dec', name: { 'en-us': 'December', 'pt-br': 'Dezembro' }, totalDays: 31 }
+    ];
+
+    var weekdays = [
+      { 'en-us': { short: 'Sun', full: 'Sunday' }, 'pt-br': { short: 'Dom', full: 'Domingo' } },
+      { 'en-us': { short: 'Mon', full: 'Monday' }, 'pt-br': { short: 'Seg', full: 'Segunda-feira' } },
+      { 'en-us': { short: 'Tue', full: 'Tuesday' }, 'pt-br': { short: 'Ter', full: 'Terça-feira' } },
+      { 'en-us': { short: 'Wed', full: 'Wednesday' }, 'pt-br': { short: 'Qua', full: 'Quarta-feira' } },
+      { 'en-us': { short: 'Thu', full: 'Thursday' }, 'pt-br': { short: 'Qui', full: 'Quinte-feira' } },
+      { 'en-us': { short: 'Fri', full: 'Friday' }, 'pt-br': { short: 'Sex', full: 'Sexta-feira' } },
+      { 'en-us': { short: 'Sat', full: 'Saturday' }, 'pt-br': { short: 'Sáb', full: 'Sábado' } },
+    ];
+
+    function isLeapYear(year) {
+      return year % 100 == 0 ? (year % 400 == 0) : (year % 4 == 0);
+    }
+
+    function getFirstWeekdayOfYear(year) {
+      let previous = year - 1;
+      return (year + Math.floor(previous / 4) - Math.floor(previous / 100) + Math.floor(previous / 400)) % 7;
+    }
+
+    function getDayOfYear(year, month, day) {
+      let dof = 0;
+      for (let i = 1; i < month; i++) {
+        let index = i - 1;
+        dof += monthInfo[index].totalDays;
+      }
+      return dof + day + (month > 2 && isLeapYear(year) ? 1 : 0);
+    }
+
+    function getWeekday(year, month, day) {
+      let dof = getDayOfYear(year, month, day);
+      let first_wd = getFirstWeekdayOfYear(year);
+
+      return (dof - 1 + first_wd) % 7;
+    }
+
+    function getDaysInMonth(month, year) {
+      return monthInfo[month - 1].totalDays + (month == 2 && isLeapYear(year) ? 1 : 0);
+    }
+
+    function getMonthCalendar(year, month) {
+      let first_wd = getWeekday(year, month, 1);
+      let total_previous = getDaysInMonth((month > 1 ? month - 1 : 12), year);
+      let total_current = getDaysInMonth(month, year);
+      let arr = [];
+      for (let i = 1; i <= 42; i++) {
+        let w = i - first_wd;
+        let d =
+          (w < 1 ? { day: total_previous + w, type: 'previous' } :
+            (w > total_current ? { day: w - total_current, type: 'next' } : { day: w, type: 'current' }));
+        let row = Math.floor((i - 1) / 7);
+        let col = (i - 1) % 7;
+        arr[row] = arr[row] ?? [];
+        arr[row][col] = d;
+      }
+      return arr;
+    }
+
+    function getMonth(calendar) {
+      for (let i = 0; i < monthInfo.length; i++) {
+        let m = monthInfo[i];
+        if ((parseInt(calendar.classList[1].substr(2)) ?? 0) - 1 == i)
+          return i + 1;
+      }
+      return undefined;
+    }
+
+    function getMonthName(calendar) {
+      let lang = calendar.classList[3] ?? 'en-us';
+      return monthInfo[getMonth(calendar) - 1].name[lang];
+    }
+
+    function getYear(calendar) {
+      let year = parseInt(calendar.classList[2]?.substr(2));
+      return !isNaN(year) ? year : 2022;
+    }
+
+    function incrementMonth(calendar) {
+      let month = getMonth(calendar);
+      let year = getYear(calendar);
+      console.log('teste');
+      month++;
+      if (month > 12) {
+        if (year == 9999)
+          month--;
+        else {
+          month = 1;
+          year++;
+        }
+      }
+      let rows = calendar.getElementsByTagName('tr');
+      let moncal = getMonthCalendar(year, month);
+      for (i = 1; i < rows.length; i++) {
+        let r = rows[i];
+        let td = r.getElementsByTagName('td');
+        for (j = 0; j < 7; j++) {
+          td[j].innerText = moncal[i - 1][j].day;
+          td[j].classList = moncal[i - 1][j].type;
+          var cl = calendar.classList;
+          calendar.classList = cl[0] + ' m-' + month + ' y-' + year + ' ' + cl[3];
+          calendar.getElementsByClassName('t-calendar-month')[0].innerText = monthInfo[month - 1].name['pt-br'];
+          calendar.getElementsByClassName('t-calendar-year')[0].innerText = year;
+        }
+      }
+    }
+    function createCalendar() {
+
+      var calendars = document.getElementsByClassName('t-calendar');
+
+      for (let i = 0; i < calendars.length; i++) { // pra cada calendário
+
+        let c = calendars[i];
+        var lang = c.classList[3] ?? 'en-us';
+
+        var year = getYear(c);
+        var month = getMonth(c);
+        var month_name = getMonthName(c);
+        var month_calendar = getMonthCalendar(year, getMonth(c));
+
+        // header
+        let calendarHeader = document.createElement('div');
+        calendarHeader.classList = 't-calendar-header';
+        let calendarTitle = document.createElement('div');
+        calendarTitle.classList = 't-calendar-title';
+        let calendarMonth = document.createElement('span');
+        calendarMonth.innerText = month_name;
+        let calendarYear = document.createElement('span');
+        calendarYear.innerText = year;
+        calendarMonth.classList = 't-calendar-month';
+        calendarYear.classList = 't-calendar-year';
+        calendarTitle.append(calendarMonth, calendarYear);
+        calendarHeader.append(calendarTitle);
+        c.append(calendarHeader);
+
+        let control = document.createElement('div');
+        control.classList = 't-calendar-control';
+        let arrowUp = document.createElement('span');
+        let arrowDown = document.createElement('span');
+        let close = document.createElement('span');
+        close.innerText = '\u274c';
+        close.classList = 't-ctrl close';
+        arrowUp.classList = 't-ctrl arrow-up';
+        arrowUp.innerText = '\u25b2';
+        arrowUp.onclick = function () { incrementMonth(c); };
+        arrowDown.innerText = '\u25bc';
+        arrowDown.classList = 't-ctrl arrow-down';
+        control.append(arrowUp, arrowDown, close);
+        calendarHeader.append(control);
+
+        //body
+        var calendarBody = document.createElement('div');
+        c.append(calendarBody);
+        calendarBody.classList = 't-calendar-body';
+        var table = document.createElement('table');
+        calendarBody.append(table);
+        var tableHeader = document.createElement('thead');
+        table.append(tableHeader);
+        var weekdayRow = document.createElement('tr');
+        weekdayRow.classList = 't-weekday-row';
+        tableHeader.append(weekdayRow);
+        for (let i = 0; i < weekdays.length; i++) {
+          var th = document.createElement('th');
+          var span = document.createElement('span');
+          span.classList = 't-weekday';
+          span.innerText = weekdays[i][lang]['short'];
+          th.append(span);
+          weekdayRow.append(th);
+        }
+        var tableBody = document.createElement('tbody');
+        table.append(tableBody);
+
+
+        for (let i = 0; i < 6; i++) {
+          var row = document.createElement('tr');
+          tableBody.append(row);
+          for (let j = 0; j < 7; j++) {
+            let td = document.createElement('td');
+            td.innerText = month_calendar[i][j].day;
+            td.classList = month_calendar[i][j].type;
+            row.append(td);
+          }
+        }
+      }
+    }
+
+    createCalendar();
+  </script>
+</body>
+
+</html>
