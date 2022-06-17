@@ -62,6 +62,10 @@
       cursor: pointer;
     }
 
+    .t-calendar table td.t-calendar-selected {
+      background-color: rgb(100, 219, 179);
+    }
+
     .t-calendar table tr:last-child td:last-child:hover {
       border-bottom-right-radius: 12px;
     }
@@ -131,8 +135,9 @@
   <div class="t-calendar m-12 y-2021 pt-br">
     <!-- criar validação via regex, melhor... -->
   </div>
-  <div class="t-calendar m-3 y-2020"></div>
+  <div class="t-calendar d-?-5-2020"></div>
   <script>
+
     const monthInfo = [
       { key: 'jan', name: { 'en-us': 'January', 'pt-br': 'Janeiro' }, totalDays: 31 },
       { key: 'feb', name: { 'en-us': 'February', 'pt-br': 'Fevereiro' }, totalDays: 28 },
@@ -148,7 +153,64 @@
       { key: 'dec', name: { 'en-us': 'December', 'pt-br': 'Dezembro' }, totalDays: 31 }
     ];
 
-    var weekdays = [
+    class Date {
+      constructor(year, month, day) {
+
+        var _year = Date.adjustYear(year);
+        var _month = Date.adjustMonth(month);
+        var _day = Date.adjustDay(day, _month, _year);
+
+        this.getYear = () => _year;
+        this.getMonth = () => _month;
+        this.getDay = () => _day;
+      }
+
+      static adjustMonth(month) {
+        return month < 1 ? 1 : (month > 12 ? 12 : month);
+      }
+
+      static adjustYear(year) {
+        return year < 1 ? 1 : (year > 9999 ? 9999 : year);
+      }
+
+      static adjustDay(day, month, year) {
+        let total = self.getDaysInMonth(month, year);
+        return day < 1 ? 1 : (day > total ? total : day);
+      }
+
+      static getDaysInMonth(month, year) {
+        return monthInfo[month - 1].totalDays + (month == 2 && self.isLeapYear(year) ? 1 : 0);
+      }
+
+      static isLeapYear(year) {
+        return year % 100 == 0 ? (year % 400 == 0) : (year % 4 == 0);
+      }
+
+      toString = () => this.getDay() + '/' + this.getMonth() + '/' + this.getYear();
+    }
+
+    class Calendar {
+      constructor(date, element) {
+        var _date = date;
+
+        this.getDate = () => _date;
+        this.element = element;
+
+        this.setYear = function(year) {
+
+        }
+
+        this.setMonth = function(month) {
+
+        }
+
+        this.setDay = function(day) {
+
+        }
+      }
+    }
+
+    const weekdays = [
       { 'en-us': { short: 'Sun', full: 'Sunday' }, 'pt-br': { short: 'Dom', full: 'Domingo' } },
       { 'en-us': { short: 'Mon', full: 'Monday' }, 'pt-br': { short: 'Seg', full: 'Segunda-feira' } },
       { 'en-us': { short: 'Tue', full: 'Tuesday' }, 'pt-br': { short: 'Ter', full: 'Terça-feira' } },
@@ -205,12 +267,33 @@
       return arr;
     }
 
+
+
+    function getDate(calendar) {
+      let dateStr = calendar.classList.value[1];
+      let pattern = /^d-(([0-9]{1,2}|\?)-){2}([0-9]{1,4}|\?)$/g;
+      let match = (dateStr.match(pattern) ?? ['d-?-?-?'])[0];
+      let parts = match.split('-');
+
+      let d = [parseInt(parts[1]), parseInt(parts[2]), parseInt(parts[3])];
+
+      return {
+        year: (isNaN(d[2]) ? 1 : adjustYear(d[2])),
+        month: (isNaN(d[1]) ? 1 : adjustMonth(d[1])),
+        day: (isNaN(d[0]) ? 1 : adjustDay(d[0], this.month, this.year))
+      };
+    }
+
     function getMonth(calendar) {
+
       for (let i = 0; i < monthInfo.length; i++) {
         let m = monthInfo[i];
-        if ((parseInt(calendar.classList[1].substr(2)) ?? 0) - 1 == i)
+        if ((parseInt(calendar.classList[1].substr(2)) ?? 0) - 1 == i) {
+          console.log('get month ' + (i + 1));
           return i + 1;
+        }
       }
+
       return undefined;
     }
 
@@ -252,87 +335,101 @@
         }
       }
     }
-    function createCalendar() {
 
-      var calendars = document.getElementsByClassName('t-calendar');
+    function buildCalendar(c) { // c is the calendar element
 
-      for (let i = 0; i < calendars.length; i++) { // pra cada calendário
+      var lang = c.classList[3] ?? 'en-us';
 
-        let c = calendars[i];
-        var lang = c.classList[3] ?? 'en-us';
+      var year = getYear(c);
+      var month = getMonth(c);
+      var month_name = getMonthName(c);
+      var month_calendar = getMonthCalendar(year, getMonth(c));
 
-        var year = getYear(c);
-        var month = getMonth(c);
-        var month_name = getMonthName(c);
-        var month_calendar = getMonthCalendar(year, getMonth(c));
+      // header
+      let calendarHeader = document.createElement('div');
+      calendarHeader.classList = 't-calendar-header';
+      let calendarTitle = document.createElement('div');
+      calendarTitle.classList = 't-calendar-title';
+      let calendarMonth = document.createElement('span');
+      calendarMonth.innerText = month_name;
+      let calendarYear = document.createElement('span');
+      calendarYear.innerText = year;
+      calendarMonth.classList = 't-calendar-month';
+      calendarYear.classList = 't-calendar-year';
+      calendarTitle.append(calendarMonth, calendarYear);
+      calendarHeader.append(calendarTitle);
+      c.append(calendarHeader);
 
-        // header
-        let calendarHeader = document.createElement('div');
-        calendarHeader.classList = 't-calendar-header';
-        let calendarTitle = document.createElement('div');
-        calendarTitle.classList = 't-calendar-title';
-        let calendarMonth = document.createElement('span');
-        calendarMonth.innerText = month_name;
-        let calendarYear = document.createElement('span');
-        calendarYear.innerText = year;
-        calendarMonth.classList = 't-calendar-month';
-        calendarYear.classList = 't-calendar-year';
-        calendarTitle.append(calendarMonth, calendarYear);
-        calendarHeader.append(calendarTitle);
-        c.append(calendarHeader);
+      let control = document.createElement('div');
+      control.classList = 't-calendar-control';
+      let arrowUp = document.createElement('span');
+      let arrowDown = document.createElement('span');
+      let close = document.createElement('span');
+      close.innerText = '\u274c';
+      close.classList = 't-ctrl close';
+      arrowUp.classList = 't-ctrl arrow-up';
+      arrowUp.innerText = '\u25b2';
+      arrowUp.onclick = function () { incrementMonth(c); };
+      arrowDown.innerText = '\u25bc';
+      arrowDown.classList = 't-ctrl arrow-down';
+      control.append(arrowUp, arrowDown, close);
+      calendarHeader.append(control);
 
-        let control = document.createElement('div');
-        control.classList = 't-calendar-control';
-        let arrowUp = document.createElement('span');
-        let arrowDown = document.createElement('span');
-        let close = document.createElement('span');
-        close.innerText = '\u274c';
-        close.classList = 't-ctrl close';
-        arrowUp.classList = 't-ctrl arrow-up';
-        arrowUp.innerText = '\u25b2';
-        arrowUp.onclick = function () { incrementMonth(c); };
-        arrowDown.innerText = '\u25bc';
-        arrowDown.classList = 't-ctrl arrow-down';
-        control.append(arrowUp, arrowDown, close);
-        calendarHeader.append(control);
-
-        //body
-        var calendarBody = document.createElement('div');
-        c.append(calendarBody);
-        calendarBody.classList = 't-calendar-body';
-        var table = document.createElement('table');
-        calendarBody.append(table);
-        var tableHeader = document.createElement('thead');
-        table.append(tableHeader);
-        var weekdayRow = document.createElement('tr');
-        weekdayRow.classList = 't-weekday-row';
-        tableHeader.append(weekdayRow);
-        for (let i = 0; i < weekdays.length; i++) {
-          var th = document.createElement('th');
-          var span = document.createElement('span');
-          span.classList = 't-weekday';
-          span.innerText = weekdays[i][lang]['short'];
-          th.append(span);
-          weekdayRow.append(th);
-        }
-        var tableBody = document.createElement('tbody');
-        table.append(tableBody);
+      //body
+      var calendarBody = document.createElement('div');
+      c.append(calendarBody);
+      calendarBody.classList = 't-calendar-body';
+      var table = document.createElement('table');
+      calendarBody.append(table);
+      var tableHeader = document.createElement('thead');
+      table.append(tableHeader);
+      var weekdayRow = document.createElement('tr');
+      weekdayRow.classList = 't-weekday-row';
+      tableHeader.append(weekdayRow);
+      for (let i = 0; i < weekdays.length; i++) {
+        var th = document.createElement('th');
+        var span = document.createElement('span');
+        span.classList = 't-weekday';
+        span.innerText = weekdays[i][lang]['short'];
+        th.append(span);
+        weekdayRow.append(th);
+      }
+      var tableBody = document.createElement('tbody');
+      table.append(tableBody);
 
 
-        for (let i = 0; i < 6; i++) {
-          var row = document.createElement('tr');
-          tableBody.append(row);
-          for (let j = 0; j < 7; j++) {
-            let td = document.createElement('td');
-            td.innerText = month_calendar[i][j].day;
-            td.classList = month_calendar[i][j].type;
-            row.append(td);
+      for (let i = 0; i < 6; i++) {
+        var row = document.createElement('tr');
+        tableBody.append(row);
+        for (let j = 0; j < 7; j++) {
+          let td = document.createElement('td');
+          td.innerText = month_calendar[i][j].day;
+          td.classList = month_calendar[i][j].type;
+          td.onclick = function() {
+            let selected = document.getElementsByClassName('t-calendar-selected');
+            for(s of selected)
+              s.classList.remove('t-calendar-selected');
+            this.classList.add('t-calendar-selected');
           }
+          if (i*7+j+1 == 23)
+            td.classList.add('t-calendar-selected');
+          row.append(td);
         }
       }
     }
 
-    createCalendar();
+    function buildAll() {
+
+      var calendars = document.getElementsByClassName('t-calendar');
+
+      for (c of calendars) {
+        buildCalendar(c);
+      }
+    }
+
+
+
+    buildAll();
   </script>
 </body>
 

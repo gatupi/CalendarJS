@@ -1,0 +1,121 @@
+.t-calendar {
+  width: 300px;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  margin: 50px auto;
+  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 0 8px #808080;
+  user-select: none;
+}
+
+.t-calendar-header {
+  position: relative;
+  width: 100%;
+  background-color: #101055;
+  color: #f0f0f0;
+  border-top-right-radius: 12px;
+  border-top-left-radius: 12px;
+  font-size: 10pt;
+  padding: 6px 0;
+}
+
+.t-calendar-title {
+  display: inline;
+  margin-left: 15px;
+}
+
+.t-calendar-month {
+  margin-right: 5px;
+}
+
+.t-calendar-body {
+  width: 100%;
+}
+
+.t-calendar-body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.t-calendar-body table th {
+  width: calc(100% / 7);
+  padding: 3px 0;
+}
+
+td {
+  text-align: center;
+  font-size: 10pt;
+  padding: 3px 0;
+}
+
+.t-calendar table td:hover {
+  background-color: rgb(255, 211, 129);
+  cursor: pointer;
+}
+
+.t-calendar table td.t-calendar-selected {
+  background-color: rgb(100, 219, 179);
+}
+
+.t-calendar table tr:last-child td:last-child:hover {
+  border-bottom-right-radius: 12px;
+}
+
+.t-calendar table tr:last-child td:first-child:hover {
+  border-bottom-left-radius: 12px;
+}
+
+/* th {
+  border-bottom: 1px solid #aaa;
+} */
+
+.t-weekday-row {
+  color: #101055;
+  background-color: #cacacf;
+  font-weight: bolder;
+  font-size: 8pt;
+  border-bottom: 1px solid #aaa;
+}
+
+.t-days-area {
+  /* background-color: rgb(100, 150, 180, 0.5); */
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 10px - 1px);
+}
+
+.t-week-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.t-day {
+  text-align: right;
+  background-color: red;
+}
+
+td.next,
+td.previous {
+  color: #808080;
+  /* #777 */
+}
+
+.t-calendar-control {
+  position: absolute;
+  right: 10px;
+  display: inline;
+}
+
+.t-ctrl {
+  font-size: 0.9em;
+  margin-left: 5px;
+  user-select: none;
+}
+
+.t-ctrl:hover {
+  cursor: pointer;
+}
+
+.t-ctrl.close {
+  font-size: 0.8em;
+}
